@@ -25,6 +25,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
+      - name: Inspect Android 17 SDK packages
+        run: |
+          sdkmanager --list --channel=3 | grep -E "platforms;android-37|build-tools;37|platforms;android-36|build-tools;36" || true
+
       - name: Install Android 17 SDK
         run: sdkmanager --channel=3 "platforms;android-37" "build-tools;37.0.0"
 
