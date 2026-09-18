@@ -32,6 +32,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.accessibility).setOnClickListener { sendAccessibilityCheck() }
         findViewById<Button>(R.id.vpnTransport).setOnClickListener { sendVpnTransportCheck() }
         findViewById<Button>(R.id.secureLock).setOnClickListener { sendSecureLockCheck() }
+        findViewById<Button>(R.id.playProtect).setOnClickListener { runPlayProtectCheck() }
     }
 
     private fun pair() {
@@ -61,6 +62,56 @@ class MainActivity : Activity() {
             } catch (e: SafeTrustApiException) {
                 runOnUiThread { status.text = if (e.statusCode == 401) "Session expired or device revoked" else "Connection error" }
             } catch (e: Exception) { runOnUiThread { status.text = safeMessage(e) } }
+        }
+    }
+
+    private fun runPlayProtectCheck() {
+        val id = deviceId.text.toString().trim()
+        val session = sessionStore.load()
+        val cloudProjectNumber = BuildConfig.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER.trim().toLongOrNull()
+        if (id.isEmpty() || session == null) { status.text = "Authenticate first"; return }
+        if (cloudProjectNumber == null || cloudProjectNumber <= 0L) {
+            status.text = "Play Integrity cloud project configuration required"
+            return
+        }
+        status.text = "Starting one-time Play Protect check…"
+        executor.execute {
+            try {
+                val contextResponse = api.createPlayProtectContext(session)
+                val contextJson = contextResponse.getJSONObject("context")
+                val context = PlayProtectContext(
+                    contextId = contextJson.getString("context_id"),
+                    purpose = contextJson.getString("purpose"),
+                    createdAt = contextJson.getString("created_at"),
+                    expiresAt = contextJson.getString("expires_at"),
+                    requestHash = contextResponse.getString("request_hash")
+                )
+                require(context.purpose == PlayProtectRequestHash.PURPOSE) { "Invalid Play Protect context purpose" }
+                require(context.requestHash == PlayProtectRequestHash.sha256Base64Url(context.contextId)) { "Play Protect request hash mismatch" }
+
+                val integrityClient = PlayIntegrityClient(this, cloudProjectNumber)
+                val token = integrityClient.requestToken(context.requestHash)
+                val result = api.submitPlayIntegrityToken(id, session, context.contextId, token)
+                val state = result.optString("state")
+                runOnUiThread {
+                    status.text = when {
+                        state == "PLAY_INTEGRITY_VERIFIER_NOT_CONFIGURED" -> "Play Integrity token received; server verification is not configured"
+                        result.optBoolean("ok") -> "Play Protect check submitted"
+                        else -> "Play Protect check unavailable"
+                    }
+                }
+            } catch (e: SafeTrustApiException) {
+                runOnUiThread {
+                    status.text = when (e.statusCode) {
+                        401 -> "Session expired or device revoked"
+                        409 -> "Play Protect check expired or already used"
+                        503 -> "Play Integrity server verification is not configured"
+                        else -> "Play Protect check unavailable"
+                    }
+                }
+            } catch (e: Exception) {
+                runOnUiThread { status.text = safeMessage(e) }
+            }
         }
     }
 
