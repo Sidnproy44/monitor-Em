@@ -8,6 +8,8 @@ data class SecureLockPayload(
 )
 
 object SecureLockSignal {
+    fun currentTimestamp(): String = java.time.Instant.now().toString()
+
     fun readSecureLockState(keyguardManager: KeyguardManager?): Boolean? =
         readSecureLockState(keyguardManager?.isDeviceSecure)
 
