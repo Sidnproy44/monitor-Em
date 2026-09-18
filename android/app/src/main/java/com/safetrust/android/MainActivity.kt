@@ -76,6 +76,26 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun sendAccessibilityCheck() {
+        val id = deviceId.text.toString().trim()
+        val session = sessionStore.load()
+        if (id.isEmpty() || session == null) { status.text = "Authenticate first"; return }
+        status.text = "Checking accessibility services…"
+        executor.execute {
+            try {
+                val enabled = AccessibilitySignal.readEnabled(contentResolver)
+                val result = api.sendAccessibilitySignal(id, session, AccessibilitySignal.currentTimestamp(), enabled)
+                runOnUiThread {
+                    status.text = if (result.optBoolean("ok")) {
+                        if (enabled) "Accessibility services reported enabled" else "Accessibility services reported disabled"
+                    } else "Connection error"
+                }
+            } catch (e: SafeTrustApiException) {
+                runOnUiThread { status.text = if (e.statusCode == 401) "Session expired or device revoked" else "Connection error" }
+            } catch (e: Exception) { runOnUiThread { status.text = safeMessage(e) } }
+        }
+    }
+
     private fun safeMessage(error: Exception): String = when (error) {
         is SafeTrustApiException -> "Connection error"
         else -> error.message?.take(80) ?: "Connection error"
