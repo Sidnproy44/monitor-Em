@@ -1,0 +1,54 @@
+name: Bootstrap Gradle Wrapper
+
+on:
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/bootstrap-wrapper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Generate wrapper
+        working-directory: android
+        run: gradle wrapper --gradle-version 9.6.0
+
+      - name: Verify wrapper checksum
+        working-directory: android
+        run: |
+          test -f gradlew
+          test -f gradlew.bat
+          test -f gradle/wrapper/gradle-wrapper.jar
+          test -f gradle/wrapper/gradle-wrapper.properties
+          sha256sum gradle/wrapper/gradle-wrapper.jar
+          grep -F 'distributionUrl=https\\://services.gradle.org/distributions/gradle-9.6.0-bin.zip' gradle/wrapper/gradle-wrapper.properties
+
+      - name: Commit wrapper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/gradlew android/gradlew.bat android/gradle/wrapper/gradle-wrapper.jar android/gradle/wrapper/gradle-wrapper.properties
+          if git diff --cached --quiet; then
+            echo "Wrapper already committed."
+            exit 0
+          fi
+          git commit -m "Add Gradle 9.6.0 wrapper"
+          git push origin HEAD:${{ github.ref_name }}
