@@ -6,6 +6,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SecureLockSignalTest {
+    @Test fun timestampIsGenerated() {
+        assertTrue(SecureLockSignal.currentTimestamp().isNotBlank())
+    }
+
     @Test fun secureStateProducesTrue() {
         assertEquals(true, SecureLockSignal.readSecureLockState(true))
     }
