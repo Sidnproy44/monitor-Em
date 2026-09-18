@@ -46,8 +46,9 @@ class SecureSessionStore(context: Context) {
             return null
         }
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, Base64.getUrlDecoder().decode(iv)))
-        return String(cipher.doFinal(Base64.getUrlDecoder().decode(ciphertext)), StandardCharsets.UTF_8)
+        val decodeFlags = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+        cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, Base64.decode(iv, decodeFlags)))
+        return String(cipher.doFinal(Base64.decode(ciphertext, decodeFlags)), StandardCharsets.UTF_8)
     }
 
     fun clear() { prefs.edit().clear().apply() }
