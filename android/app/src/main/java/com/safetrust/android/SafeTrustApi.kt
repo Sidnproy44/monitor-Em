@@ -38,6 +38,9 @@ class SafeTrustApi(private val baseUrl: String) {
 
     fun sendAccessibilitySignal(deviceId: String, session: String, clientTimestamp: String, enabled: Boolean): JSONObject =
         request("POST", "/api/devices/$deviceId/signals/accessibility", AccessibilitySignal.buildPayload(clientTimestamp, enabled), session)
+
+    fun sendVpnTransportSignal(deviceId: String, session: String, clientTimestamp: String, vpnTransportPresent: Boolean): JSONObject =
+        request("POST", "/api/devices/$deviceId/signals/vpn-transport", VpnTransportSignal.buildPayload(clientTimestamp, vpnTransportPresent), session)
 }
 
 class SafeTrustApiException(val statusCode: Int, override val message: String): Exception(message)
