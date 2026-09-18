@@ -1,9 +1,9 @@
 package com.safetrust.android
 
 import android.content.Context
+import com.google.android.gms.tasks.Tasks
 import com.google.android.play.core.integrity.IntegrityManagerFactory
 import com.google.android.play.core.integrity.StandardIntegrityManager
-import com.google.android.gms.tasks.Tasks
 import java.util.concurrent.TimeUnit
 
 class PlayIntegrityClient(
@@ -28,15 +28,18 @@ class PlayIntegrityClient(
         )
 
         val response = Tasks.await(
-            provider.request(
-                StandardIntegrityManager.StandardIntegrityTokenRequest.builder()
-                    .setRequestHash(requestHash)
-                    .build()
-            ),
+            provider.request(buildTokenRequest(requestHash)),
             60,
             TimeUnit.SECONDS
         )
 
         return response.token()
+    }
+
+    fun buildTokenRequest(requestHash: String): StandardIntegrityManager.StandardIntegrityTokenRequest {
+        require(requestHash.isNotBlank()) { "request hash is required" }
+        return StandardIntegrityManager.StandardIntegrityTokenRequest.builder()
+            .setRequestHash(requestHash)
+            .build()
     }
 }
