@@ -1,0 +1,5 @@
+<resources>
+    <color name="safetrust_background">#101418</color>
+    <color name="safetrust_text">#F4F7FA</color>
+    <color name="safetrust_muted">#AAB4BE</color>
+</resources>
