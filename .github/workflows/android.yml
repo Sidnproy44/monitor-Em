@@ -9,6 +9,7 @@ on:
       - 'android/**'
 
 # Phase 2-4.2: repository-tracked Gradle wrapper is used for verification.
+# Phase 2-6B.5D: Play Integrity readiness validation trigger.
 
 jobs:
   build:
