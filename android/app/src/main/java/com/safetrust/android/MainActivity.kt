@@ -31,6 +31,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.connectivity).setOnClickListener { sendConnectivityCheck() }
         findViewById<Button>(R.id.accessibility).setOnClickListener { sendAccessibilityCheck() }
         findViewById<Button>(R.id.vpnTransport).setOnClickListener { sendVpnTransportCheck() }
+        findViewById<Button>(R.id.secureLock).setOnClickListener { sendSecureLockCheck() }
     }
 
     private fun pair() {
@@ -119,6 +120,31 @@ class MainActivity : Activity() {
                 runOnUiThread {
                     status.text = if (result.optBoolean("ok")) {
                         if (vpnTransportPresent) "VPN transport reported present" else "VPN transport reported absent"
+                    } else "Connection error"
+                }
+            } catch (e: SafeTrustApiException) {
+                runOnUiThread { status.text = if (e.statusCode == 401) "Session expired or device revoked" else "Connection error" }
+            } catch (e: Exception) { runOnUiThread { status.text = safeMessage(e) } }
+        }
+    }
+
+    private fun sendSecureLockCheck() {
+        val id = deviceId.text.toString().trim()
+        val session = sessionStore.load()
+        if (id.isEmpty() || session == null) { status.text = "Authenticate first"; return }
+        status.text = "Checking secure lock…"
+        executor.execute {
+            try {
+                val keyguardManager = getSystemService(android.app.KeyguardManager::class.java)
+                val secureLockPresent = SecureLockSignal.readSecureLockState(keyguardManager)
+                if (secureLockPresent == null) {
+                    runOnUiThread { status.text = "Secure lock status unavailable" }
+                    return@execute
+                }
+                val result = api.sendSecureLockSignal(id, session, SecureLockSignal.currentTimestamp(), secureLockPresent)
+                runOnUiThread {
+                    status.text = if (result.optBoolean("ok")) {
+                        if (secureLockPresent) "Secure lock reported present" else "Secure lock reported absent"
                     } else "Connection error"
                 }
             } catch (e: SafeTrustApiException) {
