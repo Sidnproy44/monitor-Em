@@ -25,14 +25,22 @@ class SafeTrustApi(private val baseUrl: String) {
             val stream = if (code in 200..299) connection.inputStream else connection.errorStream
             val text = stream?.use { BufferedReader(InputStreamReader(it, StandardCharsets.UTF_8)).readText() } ?: "{}"
             val json = JSONObject(text)
-            if (code !in 200..299) throw SafeTrustApiException(code, json.optString("error", "SafeTrust request failed"))
+            if (code !in 200..299) throw SafeTrustApiException(code, json.optString("error", json.optString("state", "SafeTrust request failed")))
             return json
         } finally { connection.disconnect() }
     }
+
     fun pair(deviceId: String, pairingCode: String, publicKey: String): JSONObject = request("POST", "/api/devices/$deviceId/pair", JSONObject().put("pairing_code", pairingCode).put("key_algorithm", Crypto.ALGORITHM).put("public_key", publicKey))
     fun challenge(deviceId: String): JSONObject = request("POST", "/api/devices/$deviceId/challenge")
     fun authenticate(deviceId: String, challengeId: String, signature: String): JSONObject = request("POST", "/api/devices/$deviceId/authenticate", JSONObject().put("challenge_id", challengeId).put("signature", signature))
     fun checkSession(session: String): JSONObject = request("GET", "/api/device-session/check", session = session)
+    fun createPlayProtectContext(session: String): JSONObject = request("POST", "/api/play-protect/context", session = session)
+
+    fun submitPlayIntegrityToken(deviceId: String, session: String, contextId: String, integrityToken: String): JSONObject =
+        request("POST", "/api/devices/$deviceId/play-integrity", JSONObject()
+            .put("context_id", contextId)
+            .put("integrity_token", integrityToken), session)
+
     fun sendConnectivitySignal(deviceId: String, session: String, clientTimestamp: String, appVersion: String): JSONObject =
         request("POST", "/api/devices/$deviceId/signals/connectivity", ConnectivitySignal.buildPayload(clientTimestamp, appVersion), session)
 
