@@ -27,6 +27,7 @@ class MainActivity : Activity() {
         authenticator = DeviceAuthenticator(api, sessionStore)
         findViewById<Button>(R.id.pair).setOnClickListener { pair() }
         findViewById<Button>(R.id.connect).setOnClickListener { authenticate() }
+        findViewById<Button>(R.id.connectivity).setOnClickListener { sendConnectivityCheck() }
     }
 
     private fun pair() {
@@ -53,6 +54,21 @@ class MainActivity : Activity() {
                 authenticator.authenticate(id, keys)
                 val checked = authenticator.verifySession()
                 runOnUiThread { status.text = if (checked?.optBoolean("authenticated") == true) "Authenticated" else "Connection error" }
+            } catch (e: SafeTrustApiException) {
+                runOnUiThread { status.text = if (e.statusCode == 401) "Session expired or device revoked" else "Connection error" }
+            } catch (e: Exception) { runOnUiThread { status.text = safeMessage(e) } }
+        }
+    }
+
+    private fun sendConnectivityCheck() {
+        val id = deviceId.text.toString().trim()
+        val session = sessionStore.load()
+        if (id.isEmpty() || session == null) { status.text = "Authenticate first"; return }
+        status.text = "Sending connectivity check…"
+        executor.execute {
+            try {
+                val result = api.sendConnectivitySignal(id, session, ConnectivitySignal.currentTimestamp(), BuildConfig.VERSION_NAME)
+                runOnUiThread { status.text = if (result.optBoolean("ok")) "Connectivity reported" else "Connection error" }
             } catch (e: SafeTrustApiException) {
                 runOnUiThread { status.text = if (e.statusCode == 401) "Session expired or device revoked" else "Connection error" }
             } catch (e: Exception) { runOnUiThread { status.text = safeMessage(e) } }
