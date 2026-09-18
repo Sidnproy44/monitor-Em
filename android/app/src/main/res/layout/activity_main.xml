@@ -9,5 +9,6 @@
         <EditText android:id="@+id/pairingCode" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="Pairing code" android:inputType="text" android:textColor="@color/safetrust_text" android:textColorHint="@color/safetrust_muted"/>
         <Button android:id="@+id/pair" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Pair device"/>
         <Button android:id="@+id/connect" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Authenticate"/>
+        <Button android:id="@+id/connectivity" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Send connectivity check"/>
     </LinearLayout>
 </ScrollView>
