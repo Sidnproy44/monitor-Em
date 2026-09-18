@@ -10,5 +10,7 @@
         <Button android:id="@+id/pair" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Pair device"/>
         <Button android:id="@+id/connect" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Authenticate"/>
         <Button android:id="@+id/connectivity" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Send connectivity check"/>
+        <TextView android:id="@+id/accessibilityExplanation" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="SafeTrust checks whether accessibility services are enabled. Accessibility services have legitimate uses; this result is an indicator that needs context and does not determine whether spyware exists." android:textColor="@color/safetrust_muted" android:textSize="14sp"/>
+        <Button android:id="@+id/accessibility" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Check accessibility services"/>
     </LinearLayout>
 </ScrollView>
