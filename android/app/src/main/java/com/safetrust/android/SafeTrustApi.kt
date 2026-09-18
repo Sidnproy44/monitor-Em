@@ -37,9 +37,7 @@ class SafeTrustApi(private val baseUrl: String) {
     fun createPlayProtectContext(session: String): JSONObject = request("POST", "/api/play-protect/context", session = session)
 
     fun submitPlayIntegrityToken(deviceId: String, session: String, contextId: String, integrityToken: String): JSONObject =
-        request("POST", "/api/devices/$deviceId/play-integrity", JSONObject()
-            .put("context_id", contextId)
-            .put("integrity_token", integrityToken), session)
+        request("POST", "/api/devices/$deviceId/play-integrity", buildPlayIntegritySubmission(contextId, integrityToken), session)
 
     fun sendConnectivitySignal(deviceId: String, session: String, clientTimestamp: String, appVersion: String): JSONObject =
         request("POST", "/api/devices/$deviceId/signals/connectivity", ConnectivitySignal.buildPayload(clientTimestamp, appVersion), session)
@@ -52,6 +50,13 @@ class SafeTrustApi(private val baseUrl: String) {
 
     fun sendSecureLockSignal(deviceId: String, session: String, clientTimestamp: String, secureLockPresent: Boolean): JSONObject =
         request("POST", "/api/devices/$deviceId/signals/secure-lock", SecureLockSignal.buildPayload(secureLockPresent).put("client_timestamp", clientTimestamp), session)
+
+    companion object {
+        fun buildPlayIntegritySubmission(contextId: String, integrityToken: String): JSONObject =
+            JSONObject()
+                .put("context_id", contextId)
+                .put("integrity_token", integrityToken)
+    }
 }
 
 class SafeTrustApiException(val statusCode: Int, override val message: String): Exception(message)
