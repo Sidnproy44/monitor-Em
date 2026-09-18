@@ -28,6 +28,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.pair).setOnClickListener { pair() }
         findViewById<Button>(R.id.connect).setOnClickListener { authenticate() }
         findViewById<Button>(R.id.connectivity).setOnClickListener { sendConnectivityCheck() }
+        findViewById<Button>(R.id.accessibility).setOnClickListener { sendAccessibilityCheck() }
     }
 
     private fun pair() {
