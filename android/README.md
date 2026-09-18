@@ -34,3 +34,5 @@ The device session is not a SafeTrust user login and is not accepted by normal u
 ## Pairing bootstrap
 
 The existing key-registration endpoint requires a signed-in SafeTrust user. A native client must not emulate that with a copied browser session cookie. Phase 2-4 therefore adds a narrow bootstrap: a signed-in user creates a short-lived pairing code; Android presents it with its public key; the server consumes the code and binds the key to that exact device. No permanent pairing credential is created.
+
+CI builds and runs the Android unit tests on Android-only changes.
