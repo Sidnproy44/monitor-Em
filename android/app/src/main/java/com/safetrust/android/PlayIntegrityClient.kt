@@ -36,10 +36,12 @@ class PlayIntegrityClient(
         return response.token()
     }
 
-    fun buildTokenRequest(requestHash: String): StandardIntegrityManager.StandardIntegrityTokenRequest {
-        require(requestHash.isNotBlank()) { "request hash is required" }
-        return StandardIntegrityManager.StandardIntegrityTokenRequest.builder()
-            .setRequestHash(requestHash)
-            .build()
+    companion object {
+        fun buildTokenRequest(requestHash: String): StandardIntegrityManager.StandardIntegrityTokenRequest {
+            require(requestHash.isNotBlank()) { "request hash is required" }
+            return StandardIntegrityManager.StandardIntegrityTokenRequest.builder()
+                .setRequestHash(requestHash)
+                .build()
+        }
     }
 }
