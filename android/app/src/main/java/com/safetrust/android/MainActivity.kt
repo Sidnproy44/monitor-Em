@@ -1,6 +1,7 @@
 package com.safetrust.android
 
 import android.app.Activity
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -29,6 +30,7 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.connect).setOnClickListener { authenticate() }
         findViewById<Button>(R.id.connectivity).setOnClickListener { sendConnectivityCheck() }
         findViewById<Button>(R.id.accessibility).setOnClickListener { sendAccessibilityCheck() }
+        findViewById<Button>(R.id.vpnTransport).setOnClickListener { sendVpnTransportCheck() }
     }
 
     private fun pair() {
@@ -88,6 +90,35 @@ class MainActivity : Activity() {
                 runOnUiThread {
                     status.text = if (result.optBoolean("ok")) {
                         if (enabled) "Accessibility services reported enabled" else "Accessibility services reported disabled"
+                    } else "Connection error"
+                }
+            } catch (e: SafeTrustApiException) {
+                runOnUiThread { status.text = if (e.statusCode == 401) "Session expired or device revoked" else "Connection error" }
+            } catch (e: Exception) { runOnUiThread { status.text = safeMessage(e) } }
+        }
+    }
+
+    private fun sendVpnTransportCheck() {
+        val id = deviceId.text.toString().trim()
+        val session = sessionStore.load()
+        if (id.isEmpty() || session == null) { status.text = "Authenticate first"; return }
+        status.text = "Checking VPN transport…"
+        executor.execute {
+            try {
+                val connectivityManager = getSystemService(ConnectivityManager::class.java)
+                val vpnTransportPresent = VpnTransportSignal.readTransportPresent(connectivityManager)
+                runOnUiThread {
+                    if (vpnTransportPresent == null) {
+                        status.text = "VPN transport status unavailable"
+                    } else {
+                        status.text = "VPN transport status read"
+                    }
+                }
+                if (vpnTransportPresent == null) return@execute
+                val result = api.sendVpnTransportSignal(id, session, VpnTransportSignal.currentTimestamp(), vpnTransportPresent)
+                runOnUiThread {
+                    status.text = if (result.optBoolean("ok")) {
+                        if (vpnTransportPresent) "VPN transport reported present" else "VPN transport reported absent"
                     } else "Connection error"
                 }
             } catch (e: SafeTrustApiException) {
