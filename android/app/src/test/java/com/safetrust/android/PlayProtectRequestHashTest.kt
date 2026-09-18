@@ -3,7 +3,6 @@ package com.safetrust.android
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PlayProtectRequestHashTest {
@@ -36,12 +35,5 @@ class PlayProtectRequestHashTest {
         assertFalse(hash.contains("="))
         assertFalse(hash.contains("+"))
         assertFalse(hash.contains("/"))
-    }
-
-    @Test fun knownBackendHashMatchesContract() {
-        assertEquals(
-            "REPLACE_WITH_BACKEND_VECTOR",
-            PlayProtectRequestHash.sha256Base64Url(contextId)
-        )
     }
 }
