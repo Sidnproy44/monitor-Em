@@ -9,7 +9,10 @@ data class SecureLockPayload(
 
 object SecureLockSignal {
     fun readSecureLockState(keyguardManager: KeyguardManager?): Boolean? =
-        keyguardManager?.isDeviceSecure
+        readSecureLockState(keyguardManager?.isDeviceSecure)
+
+    fun readSecureLockState(isDeviceSecure: Boolean?): Boolean? =
+        isDeviceSecure
 
     fun payload(secureLockPresent: Boolean): SecureLockPayload =
         SecureLockPayload(secureLockPresent)
