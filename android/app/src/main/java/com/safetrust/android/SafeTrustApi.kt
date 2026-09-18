@@ -35,6 +35,9 @@ class SafeTrustApi(private val baseUrl: String) {
     fun checkSession(session: String): JSONObject = request("GET", "/api/device-session/check", session = session)
     fun sendConnectivitySignal(deviceId: String, session: String, clientTimestamp: String, appVersion: String): JSONObject =
         request("POST", "/api/devices/$deviceId/signals/connectivity", ConnectivitySignal.buildPayload(clientTimestamp, appVersion), session)
+
+    fun sendAccessibilitySignal(deviceId: String, session: String, clientTimestamp: String, enabled: Boolean): JSONObject =
+        request("POST", "/api/devices/$deviceId/signals/accessibility", AccessibilitySignal.buildPayload(clientTimestamp, enabled), session)
 }
 
 class SafeTrustApiException(val statusCode: Int, override val message: String): Exception(message)
