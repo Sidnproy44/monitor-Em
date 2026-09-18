@@ -15,9 +15,11 @@ object VpnTransportSignal {
 
     fun readTransportPresent(connectivityManager: ConnectivityManager?): Boolean? {
         val activeNetwork = connectivityManager?.activeNetwork ?: return null
-        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return null
-        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+        return readTransportPresent(connectivityManager.getNetworkCapabilities(activeNetwork))
     }
+
+    fun readTransportPresent(capabilities: NetworkCapabilities?): Boolean? =
+        capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
 
     fun payload(clientTimestamp: String, vpnTransportPresent: Boolean): VpnTransportPayload =
         VpnTransportPayload(clientTimestamp, vpnTransportPresent)
