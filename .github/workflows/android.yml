@@ -34,11 +34,12 @@ jobs:
         with:
           gradle-version: '9.6.0'
 
-      - name: Bootstrap Gradle wrapper for verification
-        run: gradle wrapper --gradle-version 9.6.0
-
-      - name: Verify wrapper
+      - name: Verify repository-tracked wrapper
         run: |
+          test -f ./gradlew
+          test -f ./gradlew.bat
+          test -f ./gradle/wrapper/gradle-wrapper.jar
+          test -f ./gradle/wrapper/gradle-wrapper.properties
           chmod +x ./gradlew
           ./gradlew --version
 
@@ -47,14 +48,3 @@ jobs:
 
       - name: Build debug APK
         run: ./gradlew assembleDebug
-
-      - name: Upload generated wrapper
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-wrapper-bootstrap
-          path: |
-            android/gradlew
-            android/gradlew.bat
-            android/gradle/wrapper/gradle-wrapper.jar
-            android/gradle/wrapper/gradle-wrapper.properties
-          if-no-files-found: error
