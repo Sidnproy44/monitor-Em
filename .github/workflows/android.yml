@@ -28,12 +28,12 @@ jobs:
       - name: Install Android 17 SDK
         run: sdkmanager --channel=3 "platforms;android-37.2" "build-tools;37.0.0"
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '9.6'
+          gradle-version: '9.6.0'
 
       - name: Bootstrap Gradle wrapper for verification
-        run: gradle wrapper --gradle-version 9.6
+        run: gradle wrapper --gradle-version 9.6.0
 
       - name: Verify wrapper
         run: |
