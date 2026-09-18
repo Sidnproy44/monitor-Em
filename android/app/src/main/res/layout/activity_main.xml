@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/safetrust_background">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+        <TextView android:id="@+id/title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SafeTrust Device" android:textColor="@color/safetrust_text" android:textSize="28sp" android:textStyle="bold"/>
+        <TextView android:id="@+id/status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Not connected" android:textColor="@color/safetrust_muted" android:textSize="16sp"/>
+        <EditText android:id="@+id/deviceId" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:hint="SafeTrust device ID" android:inputType="text" android:textColor="@color/safetrust_text" android:textColorHint="@color/safetrust_muted"/>
+        <EditText android:id="@+id/pairingCode" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="Pairing code" android:inputType="text" android:textColor="@color/safetrust_text" android:textColorHint="@color/safetrust_muted"/>
+        <Button android:id="@+id/pair" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Pair device"/>
+        <Button android:id="@+id/connect" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Authenticate"/>
+    </LinearLayout>
+</ScrollView>
